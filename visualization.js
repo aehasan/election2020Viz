@@ -2,12 +2,17 @@ var svg = d3.select("#map")
         .append("svg")
         .attr("height", 500)
         .attr("width", 1000)
-        .append("g");
+
 var promises = [];
 var projection = d3.geoAlbersUsa();
 
 var path = d3.geoPath().projection(projection);
 var fipsToVotes = {};
+var tempContainer = svg.append("g")
+
+var mouseOverContainer = svg.append("g")
+
+
 
 
 var demColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#ccccff", "#8080ff", "#3333ff", "#0000e6", "#000033" ]);
@@ -41,7 +46,7 @@ async function test() {
         var states = topojson.feature(data, data.objects.counties).features
 
         //console.log(states)
-        svg.selectAll(".states")
+        tempContainer.selectAll(".states")
             .data(states)
             .enter()
             .append("path")
@@ -79,13 +84,24 @@ async function test() {
                 return "#f2f0f7"
             })
             .on("mouseover", function(d) {
-                
+                d3.select(this).attr("fill", "#ffb3b3")
+                var xVar = event.clientX
+                var yVar = event.clientY
+                mouseOverContainer.append("g").append("rect")
+                    .attr("class", "dataBoxes")
+                    .attr("x", xVar + 5)
+                    .attr("y", yVar - 30)
+                    .attr("width", 160)
+                    .attr("height", 50)
+                    .attr("opacity", .8)
+            }).on("mouseout", function(d) {
+                d3.selectAll("rect").remove()
             })
         }
     );
 }
 
-test();
 
+test();
 
 
