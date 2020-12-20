@@ -27,7 +27,11 @@ async function test() {
          
         data.forEach(function(d) {
             //console.log(d.clinton16)
-            if (d.fips.length > 4) {
+             if(d.fips == 46113) {
+                fipsToVotes[46102] = [d.clinton16, d.trump16];
+            
+            } 
+            else if (d.fips.length > 4) {
             fipsToVotes[d.fips] = [d.clinton16, d.trump16];
             } else {
                 fipsToVotes["0" + d.fips] = [d.clinton16, d.trump16];
@@ -50,11 +54,14 @@ async function test() {
             .data(states)
             .enter()
             .append("path")
+            //.datum(groupData)
             .attr("class" , "states")
             .attr("d", path)
             .attr("fill", function(data) {
                 var temp = fipsToVotes[data.id]
             if (temp != undefined) {
+                var groupData = data.id
+                d3.select(this).datum(groupData)
                 //console.log(temp[0])
                 if (data.id == 17031) {
                     console.log(fipsToVotes[data.id])
@@ -82,20 +89,52 @@ async function test() {
                 console.log(fipsToVotes[data.id])
 
                 return "#f2f0f7"
-            })
-            .on("mouseover", function(d) {
-                d3.select(this).attr("fill", "#ffb3b3")
+            }).attr("opacity", .85)
+            .on("mouseover", function(data, index) {
+                //console.log(data)
+                console.log(index)
+                console.log(d3.select(this).data())
+                //console.log(d3.select(this).datum())
+
                 var xVar = event.clientX
                 var yVar = event.clientY
-                mouseOverContainer.append("g").append("rect")
+                
+                mouseOverContainer.append("rect")
                     .attr("class", "dataBoxes")
-                    .attr("x", xVar + 5)
-                    .attr("y", yVar - 30)
+                    .attr("x", xVar + 10)
+                    .attr("y", yVar - 40)
                     .attr("width", 160)
                     .attr("height", 50)
                     .attr("opacity", .8)
+
+                    mouseOverContainer.append("text").attr("class" , "val")
+                    .attr("x", function() { return xVar + 10 })
+                    .attr("y", function() { return yVar  - 25})
+                    .text(function() {
+            
+                        console.log(fipsToVotes[index])
+                        return fipsToVotes[index][0]
+                
+                
+                    }).attr("fill", "#3333ff" )
+                    .attr("opacity", 1)
+                    mouseOverContainer.append("text").attr("class" , "val")
+                    .attr("x", function() { return xVar + 10 })
+                    .attr("y", function() { return yVar  - 5})
+                    .text(function() {
+            
+                        console.log(fipsToVotes[index])
+                        return fipsToVotes[index][1]
+                
+                
+                    }).attr("fill","#ffb3b3" )
+                    .attr("opacity", 1)
+                
             }).on("mouseout", function(d) {
-                d3.selectAll("rect").remove()
+  
+                mouseOverContainer.selectAll("rect").remove()
+                mouseOverContainer.selectAll("text").remove()
+
             })
         }
     );
