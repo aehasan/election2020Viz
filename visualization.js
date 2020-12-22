@@ -27,13 +27,13 @@ async function test() {
         data.forEach(function(d) {
             //console.log(d.clinton16)
              if(d.fips == 46113) {
-                fipsToVotes[46102] = [d.clinton16, d.trump16];
+                fipsToVotes[46102] = [d.clinton16, d.trump16, d.county, d.state];
             
             } 
             else if (d.fips.length > 4) {
-            fipsToVotes[d.fips] = [d.clinton16, d.trump16];
+            fipsToVotes[d.fips] = [d.clinton16, d.trump16, d.county, d.state];
             } else {
-                fipsToVotes["0" + d.fips] = [d.clinton16, d.trump16];
+                fipsToVotes["0" + d.fips] = [d.clinton16, d.trump16, d.county, d.state];
 
             }
 
@@ -94,8 +94,8 @@ async function test() {
                     .attr("class", "dataBoxes")
                     .attr("x", xVar + 10)
                     .attr("y", yVar - 40)
-                    .attr("width", 180)
-                    .attr("height", 50)
+                    .attr("width", 220)
+                    .attr("height", 60)
                     .attr("opacity", .8)
 
                     
@@ -110,7 +110,7 @@ async function test() {
 
                     console.log(indivisualData)            
                     console.log(d3.max(indivisualData, function(f) {return Number(f.result)}))                                
-                var x = d3.scaleLinear().domain([0, d3.max(indivisualData.map(s => Number(s.result)))]).range([0, 120])
+                var x = d3.scaleLinear().domain([0, d3.max(indivisualData.map(s => Number(s.result)))]).range([0, 158])
                 var y = d3.scaleBand()
                     .range([ yVar - 40 , yVar ])
                     .domain(indivisualData.map(function(d) { return d.index; }))
@@ -123,7 +123,7 @@ async function test() {
                     .append("rect")
                     .attr("class", "barChart")
                     .attr("x", xVar + 10)
-                    .attr("y", function(d) { return y(d.index); })
+                    .attr("y", function(d) { return y(d.index) + 17; })
                     .attr("height", y.bandwidth() )
                     .transition()
                     .duration(750)
@@ -138,8 +138,29 @@ async function test() {
 
 
                     mouseOverContainer.append("text").attr("class" , "val")
+                    .attr("x", function() { return xVar + 12 })
+                    .attr("y", function() { return yVar - 25})
+                    .text(function() {
+            
+                        return fipsToVotes[index][2] + " County, " + fipsToVotes[index][3]
+                
+                
+                    }).attr("fill", function() {
+                        if (Number(fipsToVotes[index][0]) >= Number(fipsToVotes[index][1])) {
+                            return "#ffffff"
+                        }
+
+                        return "#ffffff" 
+                    } )
+                    .attr("opacity", 0)
+                    .transition()
+                    .duration(750)
+                    .attr("opacity", 1)
+
+
+                    mouseOverContainer.append("text").attr("class" , "val")
                     .attr("x", function() { return xVar + 10 })
-                    .attr("y", function() { return yVar  - 25})
+                    .attr("y", function() { return yVar  - 8})
                     .text(function() {
             
                         return fipsToVotes[index][0]
@@ -153,7 +174,7 @@ async function test() {
                     .attr("opacity", 1)
                     mouseOverContainer.append("text").attr("class" , "val")
                     .attr("x", function() { return xVar + 10 })
-                    .attr("y", function() { return yVar  - 5})
+                    .attr("y", function() { return yVar  +12})
                     .text(function() {
             
                         return fipsToVotes[index][1]
