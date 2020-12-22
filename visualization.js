@@ -3,7 +3,6 @@ var svg = d3.select("#map")
         .attr("height", 500)
         .attr("width", 1000)
 
-var promises = [];
 var projection = d3.geoAlbersUsa();
 
 var path = d3.geoPath().projection(projection);
@@ -15,7 +14,7 @@ var mouseOverContainer = svg.append("g")
 
 
 
-var demColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#ccccff", "#8080ff", "#3333ff", "#0000e6", "#000033" ]);
+var demColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#4d4dff", "#1a1aff", "#0000e6", "#003399", "#001133" ]);
 var repColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#ffb3b3", "#ff6666", "#ff1a1a", "#cc0000", "#8b0000" ]);
 
 
@@ -63,12 +62,7 @@ async function test() {
                 var groupData = data.id
                 d3.select(this).datum(groupData)
                 //console.log(temp[0])
-                if (data.id == 17031) {
-                    console.log(fipsToVotes[data.id])
-                    console.log(data)
-
-                }
-                var tempa = fipsToVotes[data.id][0]
+                tempa = fipsToVotes[data.id][0]
                 var tempb = fipsToVotes[data.id][1]
                 if (Number(tempa) >= Number(tempb)) {
 
@@ -86,14 +80,11 @@ async function test() {
   
                 } 
             }
-                console.log(fipsToVotes[data.id])
 
                 return "#f2f0f7"
-            }).attr("opacity", .85)
+            }).attr("opacity", 1)
             .on("mouseover", function(data, index) {
                 //console.log(data)
-                console.log(index)
-                console.log(d3.select(this).data())
                 //console.log(d3.select(this).datum())
 
                 var xVar = event.clientX
@@ -112,7 +103,6 @@ async function test() {
                     .attr("y", function() { return yVar  - 25})
                     .text(function() {
             
-                        console.log(fipsToVotes[index])
                         return fipsToVotes[index][0]
                 
                 
@@ -123,13 +113,39 @@ async function test() {
                     .attr("y", function() { return yVar  - 5})
                     .text(function() {
             
-                        console.log(fipsToVotes[index])
                         return fipsToVotes[index][1]
                 
                 
                     }).attr("fill","#ffb3b3" )
                     .attr("opacity", 1)
-                
+                //set up chart ability
+                var indivisualData = [{index: "clinton16",
+                                        result: fipsToVotes[index][0]
+                                    },
+                                    {index: "trump16",
+                                        result: fipsToVotes[index][1]
+                                    }          
+                                ]
+
+                    console.log(indivisualData)            
+                    console.log(d3.max(indivisualData, function(f) {return Number(f.result)}))                                
+                var x = d3.scaleLinear().domain([0, d3.max(indivisualData.map(s => Number(s.result)))]).range([0, 150])
+                var y = d3.scaleBand()
+                    .range([ yVar - 40 , yVar ])
+                    .domain(indivisualData.map(function(d) { return d.index; }))
+                    .padding(.2);
+
+
+                    mouseOverContainer.selectAll("myRect")
+                    .data(indivisualData)
+                    .enter()
+                    .append("rect")
+                    .attr("class", "barChart")
+                    .attr("x", xVar + 10)
+                    .attr("y", function(d) { return y(d.index); })
+                    .attr("width", function(d) { return x(d.result); })
+                    .attr("height", y.bandwidth() )
+                    .attr("fill", "#69b3a2")
             }).on("mouseout", function(d) {
   
                 mouseOverContainer.selectAll("rect").remove()
