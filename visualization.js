@@ -94,30 +94,11 @@ async function test() {
                     .attr("class", "dataBoxes")
                     .attr("x", xVar + 10)
                     .attr("y", yVar - 40)
-                    .attr("width", 160)
+                    .attr("width", 180)
                     .attr("height", 50)
                     .attr("opacity", .8)
 
-                    mouseOverContainer.append("text").attr("class" , "val")
-                    .attr("x", function() { return xVar + 10 })
-                    .attr("y", function() { return yVar  - 25})
-                    .text(function() {
-            
-                        return fipsToVotes[index][0]
-                
-                
-                    }).attr("fill", "#3333ff" )
-                    .attr("opacity", 1)
-                    mouseOverContainer.append("text").attr("class" , "val")
-                    .attr("x", function() { return xVar + 10 })
-                    .attr("y", function() { return yVar  - 5})
-                    .text(function() {
-            
-                        return fipsToVotes[index][1]
-                
-                
-                    }).attr("fill","#ffb3b3" )
-                    .attr("opacity", 1)
+                    
                 //set up chart ability
                 var indivisualData = [{index: "clinton16",
                                         result: fipsToVotes[index][0]
@@ -129,7 +110,7 @@ async function test() {
 
                     console.log(indivisualData)            
                     console.log(d3.max(indivisualData, function(f) {return Number(f.result)}))                                
-                var x = d3.scaleLinear().domain([0, d3.max(indivisualData.map(s => Number(s.result)))]).range([0, 150])
+                var x = d3.scaleLinear().domain([0, d3.max(indivisualData.map(s => Number(s.result)))]).range([0, 120])
                 var y = d3.scaleBand()
                     .range([ yVar - 40 , yVar ])
                     .domain(indivisualData.map(function(d) { return d.index; }))
@@ -143,9 +124,47 @@ async function test() {
                     .attr("class", "barChart")
                     .attr("x", xVar + 10)
                     .attr("y", function(d) { return y(d.index); })
-                    .attr("width", function(d) { return x(d.result); })
                     .attr("height", y.bandwidth() )
-                    .attr("fill", "#69b3a2")
+                    .transition()
+                    .duration(750)
+                    .attr("width", function(d) { return x(Number(d.result)); })
+                    .attr("fill", function (f) {
+                        console.log(f)
+                        if (f.index == "clinton16") {
+                            return "#1a53ff"
+                        }
+                        return "#cc0000" 
+                    })
+
+
+                    mouseOverContainer.append("text").attr("class" , "val")
+                    .attr("x", function() { return xVar + 10 })
+                    .attr("y", function() { return yVar  - 25})
+                    .text(function() {
+            
+                        return fipsToVotes[index][0]
+                
+                
+                    }).attr("fill", "#1a53ff" )
+                    .attr("opacity", 0)
+                    .transition()
+                    .duration(750)
+                    .attr("x", xVar + 15 +  x(fipsToVotes[index][0]))
+                    .attr("opacity", 1)
+                    mouseOverContainer.append("text").attr("class" , "val")
+                    .attr("x", function() { return xVar + 10 })
+                    .attr("y", function() { return yVar  - 5})
+                    .text(function() {
+            
+                        return fipsToVotes[index][1]
+                
+                
+                    }).attr("fill","#cc0000" )
+                    .attr("opacity", 0)
+                    .transition()
+                    .duration(750)
+                    .attr("x", xVar + 15 +  x(fipsToVotes[index][1]))
+                    .attr("opacity", 1)
             }).on("mouseout", function(d) {
   
                 mouseOverContainer.selectAll("rect").remove()
