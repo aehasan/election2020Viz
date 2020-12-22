@@ -1,7 +1,15 @@
+
+
+
+
 var svg = d3.select("#map")
         .append("svg")
         .attr("height", 500)
-        .attr("width", 1000)
+        .attr("width", 1500)
+
+
+
+
 
 var projection = d3.geoAlbersUsa();
 
@@ -13,9 +21,31 @@ var mouseOverContainer = svg.append("g")
 
 
 
+function zoomed(event) {
+    const {transform} = event;
+    tempContainer.attr("transform", transform);
+    tempContainer.attr("stroke-width", 1 / transform.k);
+    }
+
+
+var zoom = d3.zoom()
+
+        .scaleExtent([1,5])
+        .on('zoom', zoomed)
+
+svg.call(zoom)
+
+
+
+
+
+
 
 var demColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#4d4dff", "#1a1aff", "#0000e6", "#003399", "#001133" ]);
 var repColor = d3.scaleThreshold().domain([1,1.3,1.5,1.7,2]).range(["#ffb3b3", "#ff6666", "#ff1a1a", "#cc0000", "#8b0000" ]);
+
+var mine = d3.select("svg")
+
 
 
 async function test() {
@@ -81,14 +111,16 @@ async function test() {
                 } 
             }
 
-                return "#f2f0f7"
+                return "#ffffff"
             }).attr("opacity", 1)
             .on("mouseover", function(data, index) {
-                //console.log(data)
+                console.log(data)
                 //console.log(d3.select(this).datum())
 
                 var xVar = event.clientX
                 var yVar = event.clientY
+                d3.select(this).style("stroke", "black")
+
                 
                 mouseOverContainer.append("rect")
                     .attr("class", "dataBoxes")
@@ -97,6 +129,7 @@ async function test() {
                     .attr("width", 220)
                     .attr("height", 60)
                     .attr("opacity", .8)
+                   
 
                     
                 //set up chart ability
@@ -187,6 +220,8 @@ async function test() {
                     .attr("x", xVar + 15 +  x(fipsToVotes[index][1]))
                     .attr("opacity", 1)
             }).on("mouseout", function(d) {
+                                d3.select(this).style("stroke", "none")
+
   
                 mouseOverContainer.selectAll("rect").remove()
                 mouseOverContainer.selectAll("text").remove()
@@ -198,5 +233,9 @@ async function test() {
 
 
 test();
+
+
+ 
+
 
 
